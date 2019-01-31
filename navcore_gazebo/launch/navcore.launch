@@ -6,6 +6,20 @@
   </include>
 
 <!-- Spawn a robot into Gazebo -->
-<node name="spawn_urdf" pkg="gazebo_ros" type="spawn_model" args="-file $(find navcore_description)/urdf/navcore.urdf -urdf -z 1 -model navcore" />
+<!--node name="spawn_urdf" pkg="gazebo_ros" type="spawn_model" args="-file $(find navcore_description)/urdf/navcore.urdf -urdf -z 1 -model navcore" /-->
+
+  <!-- urdf xml robot description loaded on the Parameter Server-->
+  <param name="robot_description" command="$(find xacro)/xacro --inorder '$(find navcore_description)/urdf/navcore.xacro'" /> 
+
+  <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" ></node> 
+  <!-- start robot state publisher -->
+  <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher" output="screen" >
+    <param name="publish_frequency" type="double" value="50.0" />
+  </node>
+
+
+  <!-- Run a python script to the send a service call to gazebo_ros to spawn a URDF robot -->
+  <node name="urdf_spawner" pkg="gazebo_ros" type="spawn_model" respawn="false" output="screen"
+	args="-urdf -model diff_wheeled_robot -param robot_description"/> 
 
 </launch>
